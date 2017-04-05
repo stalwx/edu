@@ -29,6 +29,8 @@
                   <Component id="jScrollPane2" pref="504" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="transButton1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="transButton2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -41,7 +43,10 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="jScrollPane2" pref="217" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="transButton1" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="transButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="transButton2" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -71,5 +76,14 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="Components.TransButton" name="transButton2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Stop"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transButton2ActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

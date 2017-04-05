@@ -16,7 +16,7 @@ import Inter.Server;
  */
 public class MainForm extends javax.swing.JFrame {
 
-    
+    static Inter.Server server;
     Settings settings;
     /**
      * Creates new form MainForm
@@ -25,7 +25,9 @@ public class MainForm extends javax.swing.JFrame {
         
             initComponents();
             
+            
             settings = new Settings();
+            this.server = new Server();
             newLineTextArea1.append(settings.status);
             newLineTextArea1.append(settings.locale);
             newLineTextArea1.append(this.transButton1.getParent("Forms.MainForm").getClass().getName());
@@ -44,6 +46,7 @@ public class MainForm extends javax.swing.JFrame {
         transButton1 = new Components.TransButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         newLineTextArea1 = new Components.newLineTextArea();
+        transButton2 = new Components.TransButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -58,6 +61,14 @@ public class MainForm extends javax.swing.JFrame {
         newLineTextArea1.setRows(5);
         jScrollPane2.setViewportView(newLineTextArea1);
 
+        transButton2.setText("Stop");
+        transButton2.setEnabled(false);
+        transButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                transButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -68,6 +79,8 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(transButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(transButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -76,7 +89,9 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(transButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(transButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(transButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -84,30 +99,19 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void transButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transButton1ActionPerformed
-        this.newLineTextArea1.append("Click");
         
-        try
-        {
-            int i = 0; // счётчик подключений
-
-            // привинтить сокет на локалхост, порт 3128
-            ServerSocket server = new ServerSocket(3128, 0,
-                    InetAddress.getByName("localhost"));
-
-            System.out.println("server is started");
-
-            // слушаем порт
-            while(true)
-            {
-                // ждём нового подключения, после чего запускаем обработку клиента
-                // в новый вычислительный поток и увеличиваем счётчик на единичку
-                new Server(i, server.accept());
-                i++;
-            }
-        }
-        catch(Exception e)
-        {System.out.println("init error: "+e);} // вывод исключений
+        this.server.start();
+        
+        this.transButton1.setEnabled(false);
+        this.transButton2.setEnabled(true);
     }//GEN-LAST:event_transButton1ActionPerformed
+
+    private void transButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transButton2ActionPerformed
+        this.server.finish();
+        this.transButton1.setEnabled(true);
+        this.transButton2.setEnabled(false);
+       
+    }//GEN-LAST:event_transButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -148,5 +152,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private Components.newLineTextArea newLineTextArea1;
     private Components.TransButton transButton1;
+    private Components.TransButton transButton2;
     // End of variables declaration//GEN-END:variables
 }

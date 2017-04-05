@@ -8,6 +8,9 @@ package Inter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,6 +20,7 @@ public class Server extends Thread {
     
     Socket s;
     int num;
+    private volatile boolean mFinish = false;
     
     public Server(int num, Socket s)
     {
@@ -25,15 +29,32 @@ public class Server extends Thread {
         this.s = s;
 
         // и запускаем новый вычислительный поток (см. ф-ю run())
-        setDaemon(true);
-        setPriority(NORM_PRIORITY);
-        start();
+        //setDaemon(true);
+        //setPriority(NORM_PRIORITY);
+        //start();
     }
     
-    public void run()
-    {
-        try
-        {
+    public Server(){
+        
+    }
+    
+    public void finish(){
+        mFinish = true;
+    }
+    
+    @Override
+    public void run() {
+        while (true) {
+            System.out.println("Привет из побочного потока!");
+            try {
+                if(mFinish){
+                    System.out.println("Выход из побочного потока!");
+                    return;
+                }
+                TimeUnit.SECONDS.sleep(1);
+                /*
+            try
+            {
             // из сокета клиента берём поток входящих данных
             InputStream is = s.getInputStream();
             // и оттуда же - поток данных от сервера к клиенту
@@ -55,8 +76,13 @@ public class Server extends Thread {
 
             // завершаем соединение
             s.close();
+            }
+            catch(Exception e)
+            {System.out.println("init error: "+e);} // вывод исключений
+                 */
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        catch(Exception e)
-        {System.out.println("init error: "+e);} // вывод исключений
     }
 }
