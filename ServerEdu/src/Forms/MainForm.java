@@ -5,7 +5,10 @@
  */
 package Forms;
 
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import set.Settings;
+import Inter.Server;
 
 /**
  *
@@ -82,6 +85,28 @@ public class MainForm extends javax.swing.JFrame {
 
     private void transButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transButton1ActionPerformed
         this.newLineTextArea1.append("Click");
+        
+        try
+        {
+            int i = 0; // счётчик подключений
+
+            // привинтить сокет на локалхост, порт 3128
+            ServerSocket server = new ServerSocket(3128, 0,
+                    InetAddress.getByName("localhost"));
+
+            System.out.println("server is started");
+
+            // слушаем порт
+            while(true)
+            {
+                // ждём нового подключения, после чего запускаем обработку клиента
+                // в новый вычислительный поток и увеличиваем счётчик на единичку
+                new Server(i, server.accept());
+                i++;
+            }
+        }
+        catch(Exception e)
+        {System.out.println("init error: "+e);} // вывод исключений
     }//GEN-LAST:event_transButton1ActionPerformed
 
     /**
