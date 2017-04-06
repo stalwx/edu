@@ -5,8 +5,10 @@
  */
 package Inter;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -22,11 +24,13 @@ public class Server extends Thread {
     int num;
     private volatile boolean mFinish = false;
     
-    public Server(int num, Socket s)
+    public Server(int port, Socket s) throws IOException
     {
         // копируем данные
         this.num = num;
         this.s = s;
+        
+        ServerSocket ss = new ServerSocket(port);
 
         // и запускаем новый вычислительный поток (см. ф-ю run())
         //setDaemon(true);
@@ -46,13 +50,12 @@ public class Server extends Thread {
     public void run() {
         while (true) {
             System.out.println("Привет из побочного потока!");
-            try {
-                if(mFinish){
-                    System.out.println("Выход из побочного потока!");
-                    return;
-                }
-                TimeUnit.SECONDS.sleep(1);
-                /*
+            if(mFinish){
+                return;
+            }
+            
+            // TimeUnit.SECONDS.sleep(1);
+            /*
             try
             {
             // из сокета клиента берём поток входящих данных
@@ -79,10 +82,7 @@ public class Server extends Thread {
             }
             catch(Exception e)
             {System.out.println("init error: "+e);} // вывод исключений
-                 */
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            */
         }
     }
 }

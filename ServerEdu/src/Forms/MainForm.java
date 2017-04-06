@@ -16,7 +16,7 @@ import Inter.Server;
  */
 public class MainForm extends javax.swing.JFrame {
 
-    static Inter.Server server;
+    Inter.Server server;
     Settings settings;
     /**
      * Creates new form MainForm
@@ -27,7 +27,7 @@ public class MainForm extends javax.swing.JFrame {
             
             
             settings = new Settings();
-            this.server = new Server();
+            
             newLineTextArea1.append(settings.status);
             newLineTextArea1.append(settings.locale);
             newLineTextArea1.append(this.transButton1.getParent("Forms.MainForm").getClass().getName());
@@ -99,7 +99,7 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void transButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transButton1ActionPerformed
-        
+        this.server = new Server();
         this.server.start();
         
         this.transButton1.setEnabled(false);
