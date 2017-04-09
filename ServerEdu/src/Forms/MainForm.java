@@ -99,7 +99,7 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void transButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transButton1ActionPerformed
-        this.server = new Server();
+        this.server = new Server(8888);
         this.server.start();
         
         this.transButton1.setEnabled(false);

@@ -1,45 +1,32 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Inter;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author stalwx
- */
 public class Server extends Thread {
     
+    private static HashSet<String> names = new HashSet<String>();
+    private static HashSet<PrintWriter> writers = new HashSet<PrintWriter>();
+    private static int port;
     Socket s;
     int num;
     private volatile boolean mFinish = false;
     
-    public Server(int port, Socket s) throws IOException
+    public Server(int port) 
     {
-        // копируем данные
-        this.num = num;
-        this.s = s;
-        
-        ServerSocket ss = new ServerSocket(port);
-
-        // и запускаем новый вычислительный поток (см. ф-ю run())
-        //setDaemon(true);
-        //setPriority(NORM_PRIORITY);
-        //start();
-    }
-    
-    public Server(){
-        
+        this.port = port;
     }
     
     public void finish(){
@@ -48,41 +35,80 @@ public class Server extends Thread {
     
     @Override
     public void run() {
-        while (true) {
-            System.out.println("Привет из побочного потока!");
-            if(mFinish){
-                return;
+        try {
+            ServerSocket listener = new ServerSocket(port);
+            try {
+                while (true) {
+                    new Handler(listener.accept()).start();
+                    if (mFinish) {
+                        listener.close();
+                        return;
+                    }
+                }
+            } finally {
+                listener.close();
             }
-            
-            // TimeUnit.SECONDS.sleep(1);
-            /*
-            try
-            {
-            // из сокета клиента берём поток входящих данных
-            InputStream is = s.getInputStream();
-            // и оттуда же - поток данных от сервера к клиенту
-            OutputStream os = s.getOutputStream();
+        } catch (IOException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    private static class Handler extends Thread {
+        private String name;
+        private Socket socket;
+        private BufferedReader in;
+        private PrintWriter out;
 
-            // буффер данных в 64 килобайта
-            byte buf[] = new byte[64*1024];
-            // читаем 64кб от клиента, результат - кол-во реально принятых данных
-            int r = is.read(buf);
+        public Handler(Socket socket) {
+            this.socket = socket;
+        }
+        
+        public void run() {
+            try {
 
-            // создаём строку, содержащую полученную от клиента информацию
-            String data = new String(buf, 0, r);
+                in = new BufferedReader(new InputStreamReader(
+                    socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
 
-            // добавляем данные об адресе сокета:
-            data = ""+num+": "+"\n"+data;
-
-            // выводим данные:
-            os.write(data.getBytes());
-
-            // завершаем соединение
-            s.close();
+                while (true) {
+                    out.println("SUBMITNAME");
+                    name = in.readLine();
+                    if (name == null) {
+                        return;
+                    }
+                    synchronized (names) {
+                        if (!names.contains(name)) {
+                            names.add(name);
+                            break;
+                        }
+                    }
+                }
+                out.println("NAMEACCEPTED");
+                writers.add(out);
+                while (true) {
+                    String input = in.readLine();
+                    if (input == null) {
+                        return;
+                    }
+                    for (PrintWriter writer : writers) {
+                        writer.println("MESSAGE " + name + ": " + input);
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println(e);
+            } finally {
+                if (name != null) {
+                    names.remove(name);
+                }
+                if (out != null) {
+                    writers.remove(out);
+                }
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                }
             }
-            catch(Exception e)
-            {System.out.println("init error: "+e);} // вывод исключений
-            */
         }
     }
 }
