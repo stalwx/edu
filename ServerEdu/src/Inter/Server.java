@@ -55,6 +55,7 @@ public class Server extends Thread {
     
     
     private static class Handler extends Thread {
+
         private String name;
         private Socket socket;
         private BufferedReader in;
@@ -63,12 +64,12 @@ public class Server extends Thread {
         public Handler(Socket socket) {
             this.socket = socket;
         }
-        
+
         public void run() {
             try {
 
                 in = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
+                        socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
                 while (true) {
